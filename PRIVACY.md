@@ -236,6 +236,6 @@ dotty account export
 ## Questions?
 
 - Email: privacy@dotty.bot
-- GitHub: https://github.com/willmhawkins/dotty/issues
+- GitHub: https://github.com/dottybotdev/dotty-cli/issues
 
 Last updated: 2026-02-02

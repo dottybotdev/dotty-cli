@@ -28,10 +28,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/willmhawkins/dotty"
+    "url": "https://github.com/dottybotdev/dotty-cli"
   },
   "keywords": ["claude", "claude-code", "ai", "supervisor", "voice", "dotty"],
-  "author": "Will Hawkins",
+  "author": "dottybotdev",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"

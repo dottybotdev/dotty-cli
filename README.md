@@ -231,7 +231,7 @@ Even with `terminal` capability, these patterns are always blocked:
 
 ```bash
 # Clone the repo
-git clone https://github.com/willmhawkins/dotty
+git clone https://github.com/dottybotdev/dotty-cli
 cd dotty
 
 # Install dependencies
