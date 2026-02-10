@@ -5,7 +5,14 @@
 
 import WebSocket from 'ws';
 import { randomUUID } from 'crypto';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { loadConfig, getPlatform } from './config';
+import { listClaudeSessions } from './commands/sessions';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf-8'));
 import type {
   AgentMessage,
   AuthPayload,
@@ -141,7 +148,7 @@ export class AgentConnection {
 
     const payload: AuthPayload = {
       token: config.token!,
-      agentVersion: '0.1.0',  // TODO: Read from package.json
+      agentVersion: pkg.version,
       machineId: config.machineId,
       machineLabel: config.machineLabel,
       platform: getPlatform(),
@@ -171,7 +178,7 @@ export class AgentConnection {
         break;
 
       case 'ping':
-        this.send('heartbeat', this.buildHeartbeat());
+        this.buildHeartbeat().then(hb => this.send('heartbeat', hb));
         break;
 
       default:
@@ -249,16 +256,24 @@ export class AgentConnection {
     this.ws.send(JSON.stringify(message));
   }
 
-  private buildHeartbeat(): HeartbeatPayload {
+  private async buildHeartbeat(): Promise<HeartbeatPayload> {
+    let activeSessions = 0;
+    try {
+      const sessions = await listClaudeSessions();
+      activeSessions = sessions.length;
+    } catch {
+      // Session discovery may fail on some platforms
+    }
     return {
-      activeSessions: 0,  // TODO: Get from session tracker
+      activeSessions,
       uptime: Date.now() - this.startTime,
     };
   }
 
   private startHeartbeat(): void {
-    this.heartbeatInterval = setInterval(() => {
-      this.send('heartbeat', this.buildHeartbeat());
+    this.heartbeatInterval = setInterval(async () => {
+      const hb = await this.buildHeartbeat();
+      this.send('heartbeat', hb);
     }, 30000);  // Every 30 seconds
   }
 
